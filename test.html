@@ -1,153 +1,139 @@
-
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <title>帶狀算溝</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        /* 整體美化 */
-        body {
-            font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(to bottom, #f5f7fa, #c3cfe2);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-        }
-
-        .container {
-            background-color: #ffffffcc;
-            padding: 40px 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-        }
-
-        h2 {
-            margin-bottom: 30px;
-            color: #333;
-            font-size: 28px;
-        }
-
-        input {
-            font-size: 18px;
-            padding: 12px 15px;
-            width: 100%;
-            margin-bottom: 20px;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            transition: border-color 0.3s;
-        }
-
-        input:focus {
-            border-color: #007aff;
-            outline: none;
-        }
-
-        button {
-            font-size: 18px;
-            padding: 12px 15px;
-            width: 100%;
-            border: none;
-            border-radius: 10px;
-            background-color: #007aff;
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.2s;
-        }
-
-        button:hover {
-            background-color: #005bb5;
-            transform: translateY(-2px);
-        }
-
-        .result {
-            margin-top: 25px;
-            font-size: 22px;
-            font-weight: bold;
-            color: #007aff;
-            padding: 15px;
-            border-radius: 12px;
-            background-color: #e0f0ff;
-            min-height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background-color 0.3s, color 0.3s;
-        }
-    </style>
+<meta charset="UTF-8">
+<title>線芯顏色計算</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body {
+    font-family: 'Noto Sans TC', sans-serif;
+    background: linear-gradient(to bottom, #f5f7fa, #c3cfe2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+.container {
+    background: #ffffffcc;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.1);
+    width: 100%;
+    max-width: 420px;
+    text-align: center;
+}
+h2 {
+    margin-bottom: 20px;
+}
+input, select, button {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+    border: 2px solid #ddd;
+}
+button {
+    background: #007aff;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+.result {
+    margin-top: 20px;
+    font-size: 20px;
+    font-weight: bold;
+    padding: 15px;
+    border-radius: 12px;
+    background: #e0f0ff;
+    color: #007aff;
+}
+</style>
 </head>
+
 <body>
+<div class="container">
+    <h2>線芯顏色計算</h2>
 
-    <div class="container">
-        <h2>帶狀算溝</h2>
-        <input type="number" id="inputA" placeholder="請輸入芯數" onkeydown="checkEnter(event)">
-        <button onclick="calculate()">計算</button>
-        <div class="result" id="resultText">結果會顯示在這裡</div>
-    </div>
+    <!-- 選擇模式 -->
+    <select id="mode">
+        <option value="48">48C(6 芯 × 8 管）</option>
+        <option value="24">24C（6 芯 × 4 管）</option>
+        <option value="20">帶狀</option>
+    </select>
 
-    <script>
-        // 按 Enter 鍵就送出
-        function checkEnter(event) {
-            if (event.key === "Enter") {
-                calculate();
-            }
+    <input type="number" id="startCore" value="1" placeholder="起始芯數">
+    <input type="number" id="inputCore" placeholder="請輸入芯數">
+
+    <button onclick="calculate()">計算</button>
+
+    <div class="result" id="resultText">結果顯示</div>
+</div>
+
+<script>
+function calculate() {
+    const mode = document.getElementById("mode").value;
+    const start = parseInt(document.getElementById("startCore").value);
+    const input = parseInt(document.getElementById("inputCore").value);
+    const result = document.getElementById("resultText");
+
+    if (isNaN(start) || isNaN(input) || start <= 0 || input <= 0) {
+        result.textContent = "請輸入正確數字";
+        return;
+    }
+
+    const a = start + input - 1;
+
+    /* ===== 20 芯（一溝） ===== */
+    if (mode === "20") {
+        let g, b, color;
+
+        if (a % 20 === 0) {
+            g = a / 20;
+            color = "紫粉";
+        } else {
+            g = Math.floor(a / 20) + 1;
+            b = a % 20;
+
+            const colors = [
+                "紫粉","藍","藍1白","藍2白","藍粉",
+                "黃","黃1白","黃2白","黃粉",
+                "綠","綠1白","綠2白","綠粉",
+                "紅","紅1白","紅2白","紅粉",
+                "紫","紫1白","紫2白"
+            ];
+            color = colors[b];
         }
 
-        function calculate() {
-            const a = parseInt(document.getElementById("inputA").value);
-            const result = document.getElementById("resultText");
+        result.textContent = `第 ${a} 芯 → 第 ${g} 溝 ${color}`;
+        return;
+    }
 
-            if (isNaN(a) || a <= 0) {
-                result.textContent = "請輸入正確的數字";
-                result.style.backgroundColor = "#ffe0e0";
-                result.style.color = "#ff3b3b";
-                return;
-            }
+    /* ===== 48 / 24 芯（管 + 芯） ===== */
+    const coreColors = ["藍", "黃", "綠", "紅", "紫", "白"];
+    const tubeColors48 = ["藍", "黃", "綠", "紅", "紫", "白", "黑", "橘"];
+    const tubeColors24 = ["藍", "黃", "綠", "紅"];
 
-            let g, b, color;
+    const tubeIndex = Math.floor((a - 1) / 6);
+    const coreIndex = (a - 1) % 6;
 
-            if (a % 20 === 0) {
-                g = a / 20;
-                color = "紫粉";
-            } else {
-                g = Math.floor(a / 20) + 1;
-                b = a % 20;
+    if (mode === "48" && a > 48) {
+        result.textContent = "超過 48 芯範圍";
+        return;
+    }
+    if (mode === "24" && a > 24) {
+        result.textContent = "超過 24 芯範圍";
+        return;
+    }
 
-                switch (b) {
-                    case 1: color = "藍"; break;
-                    case 2: color = "藍1白"; break;
-                    case 3: color = "藍2白"; break;
-                    case 4: color = "藍粉"; break;
-                    case 5: color = "黃"; break;
-                    case 6: color = "黃1白"; break;
-                    case 7: color = "黃2白"; break;
-                    case 8: color = "黃粉"; break;
-                    case 9: color = "綠"; break;
-                    case 10: color = "綠1白"; break;
-                    case 11: color = "綠2白"; break;
-                    case 12: color = "綠粉"; break;
-                    case 13: color = "紅"; break;
-                    case 14: color = "紅1白"; break;
-                    case 15: color = "紅2白"; break;
-                    case 16: color = "紅粉"; break;
-                    case 17: color = "紫"; break;
-                    case 18: color = "紫1白"; break;
-                    case 19: color = "紫2白"; break;
-                    case 0: color = "紫粉"; break;
-                }
-            }
+    const tubeColor = mode === "48"
+        ? tubeColors48[tubeIndex]
+        : tubeColors24[tubeIndex];
 
-            result.textContent = g + "溝" + color;
-            result.style.backgroundColor = "#e0f0ff";
-            result.style.color = "#007aff";
-        }
-    </script>
+    const coreColor = coreColors[coreIndex];
 
+    result.textContent = `第 ${a} 芯 → ${tubeColor}管 ${coreColor}芯線`;
+}
+</script>
 </body>
 </html>
-
