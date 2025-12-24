@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
@@ -5,7 +6,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 body {
-    font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: "Microsoft JhengHei", "微軟正黑體",
+                 -apple-system, BlinkMacSystemFont,
+                 "PingFang TC", "Heiti TC", sans-serif;
     background: radial-gradient(circle at top, #1b1f2a, #000000);
     display: flex;
     justify-content: center;
@@ -14,7 +17,6 @@ body {
     margin: 0;
     color: #ffffff;
 }
-
 .container {
     background: rgba(20, 24, 36, 0.9);
     backdrop-filter: blur(10px);
@@ -47,16 +49,6 @@ input, select {
     background: #0d111c;
     color: #ffffff;
     outline: none;
-    transition: 0.3s;
-}
-
-input::placeholder {
-    color: #8a94a6;
-}
-
-input:focus, select:focus {
-    border-color: #4da3ff;
-    box-shadow: 0 0 12px rgba(77,163,255,0.6);
 }
 
 button {
@@ -69,18 +61,6 @@ button {
     background: linear-gradient(135deg, #007aff, #00c6ff);
     color: white;
     font-weight: bold;
-    letter-spacing: 1px;
-    box-shadow:
-        0 0 20px rgba(0,122,255,0.7),
-        inset 0 0 10px rgba(255,255,255,0.15);
-    transition: 0.25s;
-}
-
-button:hover {
-    transform: translateY(-2px);
-    box-shadow:
-        0 0 28px rgba(0,160,255,0.9),
-        inset 0 0 12px rgba(255,255,255,0.2);
 }
 
 .result {
@@ -91,9 +71,6 @@ button:hover {
     font-weight: bold;
     background: linear-gradient(135deg, #0a1a33, #08101f);
     color: #7ec8ff;
-    box-shadow:
-        inset 0 0 20px rgba(0,122,255,0.25),
-        0 0 25px rgba(0,122,255,0.4);
     min-height: 60px;
     display: flex;
     align-items: center;
@@ -107,10 +84,11 @@ button:hover {
     <h2>線芯顏色計算</h2>
 
     <select id="mode">
-        <option value="20" selected>帶狀</option>
-        <option value="24"> 24C（6 芯 × 4 管）</option>
-        <option value="48"> 48C（6 芯 × 8 管）</option>
-        <option value="96"> 96C (8 芯 × 12 管）</option>
+        <option value="20"> 帶狀(溝槽型) </option>
+        <option value="24"> 24C（6C×4）</option>
+        <option value="48"> 48C（6C×8）</option>
+        <option value="96"> 96C（8C×12）</option>
+        <option value="216"> 216C（12C×18）</option>
     </select>
 
     <input type="number" id="startCore" value="1" placeholder="起始芯數">
@@ -135,7 +113,7 @@ function calculate() {
 
     const a = start + input - 1;
 
-    // ===== 20 芯（1 溝）=====
+    /* ===== 20 芯 ===== */
     if (mode === "20") {
         const colors = [
             "紫粉","藍","藍1白","藍2白","藍粉",
@@ -158,45 +136,67 @@ function calculate() {
         return;
     }
 
-    // ===== 24 / 48 芯 =====
-    if (mode === "24" && a > 24) {
-        result.textContent = "超過 24 芯範圍";
-        return;
-    }
-    if (mode === "48" && a > 48) {
-        result.textContent = "超過 48 芯範圍";
+    /* ===== 24 / 48 ===== */
+    if (mode === "24" && a > 24 || mode === "48" && a > 48) {
+        result.textContent = "超出範圍";
         return;
     }
 
     if (mode === "24" || mode === "48") {
-        const coreColors6 = ["藍", "黃", "綠", "紅", "紫", "白"];
-        const tubeColors24 = ["藍", "黃", "綠", "紅"];
-        const tubeColors48 = ["藍", "黃", "綠", "紅", "紫", "白", "黑", "橘"];
+        const core6 = ["藍","黃","綠","紅","紫","白"];
+        const tube24 = ["藍","黃","綠","紅"];
+        const tube48 = ["藍","黃","綠","紅","紫","白","黑","橘"];
 
         const tubeIndex = Math.floor((a - 1) / 6);
         const coreIndex = (a - 1) % 6;
-        const tubeColor = mode === "48" ? tubeColors48[tubeIndex] : tubeColors24[tubeIndex];
+        const tubeColor = mode === "48" ? tube48[tubeIndex] : tube24[tubeIndex];
 
-        result.textContent = `第 ${a} 芯 → ${tubeColor}管的 ${coreColors6[coreIndex]}`;
+        result.textContent = `第 ${a} 芯 → ${tubeColor}管 ${core6[coreIndex]}芯線`;
         return;
     }
 
-    // ===== 96 芯（8 芯 × 12 管）=====
+    /* ===== 96 ===== */
     if (mode === "96") {
         if (a > 96) {
             result.textContent = "超過 96 芯範圍";
             return;
         }
 
-        const coreColors8 = ["藍","黃","綠","紅","紫","白","棕","黑"];
-        const tubeColors96 = ["藍","黃","綠","紅","紫","白","棕","黑","青","橙","粉","灰"];
+        const core8 = ["藍","黃","綠","紅","紫","白","棕","黑"];
+        const tube96 = ["藍","黃","綠","紅","紫","白","棕","黑","青","橙","粉","灰"];
 
         const tubeIndex = Math.floor((a - 1) / 8);
         const coreIndex = (a - 1) % 8;
 
-        result.textContent = `第 ${a} 芯 → ${tubeColors96[tubeIndex]}管的 ${coreColors8[coreIndex]}`;
+        result.textContent = `第 ${a} 芯 → ${tube96[tubeIndex]}管 ${core8[coreIndex]}芯線`;
+        return;
+    }
+
+    /* ===== 216（12 芯 × 18 管）===== */
+    if (mode === "216") {
+        if (a > 216) {
+            result.textContent = "超過 216 芯範圍";
+            return;
+        }
+
+        const core12 = ["藍","黃","綠","紅","紫","白","棕","黑","青","橙","粉","灰"];
+        const tube216 = [
+            "內藍","內黃","內綠","內紅","內紫","內白",
+            "外藍","外黃","外綠","外紅","外紫","外白",
+            "外棕","外黑","外青","外橙","外粉","外灰"
+        ];
+
+        const tubeIndex = Math.floor((a - 1) / 12);
+        const coreIndex = (a - 1) % 12;
+
+        result.textContent = `第 ${a} 芯 → ${tube216[tubeIndex]}管 ${core12[coreIndex]}芯線`;
     }
 }
+document.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") {
+        calculate();
+    }
+});
 </script>
 </body>
 </html>
